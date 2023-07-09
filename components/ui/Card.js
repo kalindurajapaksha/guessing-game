@@ -2,8 +2,8 @@ import { View, StyleSheet } from "react-native";
 import React from "react";
 import { COLORS } from "../../util/constants";
 
-const Card = ({ children }) => {
-  return <View style={styles.card}>{children}</View>;
+const Card = ({ children, style }) => {
+  return <View style={[styles.card, style]}>{children}</View>;
 };
 
 export default Card;
@@ -23,5 +23,6 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     shadowOpacity: 0.25,
     alignItems: "center",
+    justifyContent: "center",
   },
 });

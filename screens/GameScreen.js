@@ -1,4 +1,10 @@
-import { View, StyleSheet, Alert, FlatList } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Alert,
+  FlatList,
+  useWindowDimensions,
+} from "react-native";
 import React, { useEffect, useState } from "react";
 import Title from "../components/ui/Title";
 import { generateRandomBetween } from "../util/helperFunctions";
@@ -14,6 +20,7 @@ let minBoundary = 1;
 let maxBoundary = 100;
 
 const GameScreen = ({ userNumber, onGameOver }) => {
+  const { width, height } = useWindowDimensions();
   const initialGuess = generateRandomBetween(1, 100, userNumber);
   const [currentGuess, setCurrentGuess] = useState(initialGuess);
   const [guessRounds, setGuessRounds] = useState([initialGuess]);
@@ -53,9 +60,9 @@ const GameScreen = ({ userNumber, onGameOver }) => {
     setCurrentGuess(newRandomNumber);
     setGuessRounds((currGuesses) => [newRandomNumber, ...currGuesses]);
   };
-  return (
-    <View style={styles.screen}>
-      <Title style={styles.title}>Opponent's Guess</Title>
+
+  let content = (
+    <>
       <NumberContainer>{currentGuess}</NumberContainer>
       <Card>
         <InstructionText style={styles.instructionText}>
@@ -89,6 +96,61 @@ const GameScreen = ({ userNumber, onGameOver }) => {
           keyExtractor={(item) => item}
         />
       </View>
+    </>
+  );
+
+  if (width > 500) {
+    content = (
+      <View style={styles.pageLandscape}>
+        <View style={styles.listContainer}>
+          <FlatList
+            data={guessRounds}
+            renderItem={({ item, index }) => (
+              <GuessLogItem
+                roundNumber={guessRounds.length - index}
+                guess={item}
+              />
+            )}
+            keyExtractor={(item) => item}
+          />
+        </View>
+        <View style={styles.controlsContainerLandscape}>
+          <NumberContainer style={styles.numberContainerLandscape}>
+            {currentGuess}
+          </NumberContainer>
+          <Card style={styles.controlsLandscape}>
+            <InstructionText style={styles.instructionText}>
+              Higher or lower?
+            </InstructionText>
+            <View style={styles.buttonsContainer}>
+              <PrimaryButton
+                style={styles.buttonContainer}
+                onPress={nextGuessHandler.bind(this, "lower")}
+              >
+                <Ionicons
+                  name="md-remove"
+                  size={24}
+                  color={COLORS.primary500}
+                />
+              </PrimaryButton>
+
+              <PrimaryButton
+                style={styles.buttonContainer}
+                onPress={nextGuessHandler.bind(this, "greater")}
+              >
+                <Ionicons name="md-add" size={24} color={COLORS.primary500} />
+              </PrimaryButton>
+            </View>
+          </Card>
+        </View>
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.screen}>
+      <Title style={styles.title}>Opponent's Guess</Title>
+      {content}
     </View>
   );
 };
@@ -111,6 +173,26 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     flex: 1,
-    padding: 16,
+    padding: 8,
+  },
+  // listContainerLandscape: {
+  //   flex: 1,
+  //   padding: 8,
+  // },
+  pageLandscape: {
+    flexDirection: "row",
+  },
+  controlsContainerLandscape: {
+    flex: 1,
+    alignItems: "center",
+    paddingHorizontal: 30,
+  },
+  controlsLandscape: {
+    width: "100%",
+    marginTop: 0,
+  },
+  numberContainerLandscape: {
+    width: "100%",
+    padding: 0,
   },
 });
